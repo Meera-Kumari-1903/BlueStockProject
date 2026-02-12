@@ -1,41 +1,79 @@
-import { useState } from "react";
-import { signInWithPopup } from "firebase/auth";
-import type { User } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { auth } from "./firebase";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  User,
+} from "firebase/auth";
 
-import { auth, provider } from "./firebase.js";
-
+import { saveProgress, getProgress } from "./storage";
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [level, setLevel] = useState(1);
+  const [score, setScore] = useState(0);
 
-  const login = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-    } catch (err) {
-      console.log(err);
-    }
+  // Detect login
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      setUser(u);
+
+      if (u) {
+        const data = await getProgress(u.uid);
+        if (data) {
+          setLevel(data.level);
+          setScore(data.score);
+        }
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+  // Google Login
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  };
+
+  // Logout
+  const handleLogout = async () => {
+    await signOut(auth);
+    setLevel(1);
+    setScore(0);
+  };
+
+  // Simulate level complete
+  const completeLevel = async () => {
+    if (!user) return;
+
+    const newLevel = level + 1;
+    const newScore = score + 10;
+
+    setLevel(newLevel);
+    setScore(newScore);
+
+    await saveProgress(user.uid, newLevel, newScore);
   };
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-slate-900 text-white">
-      <h1 className="text-4xl font-bold mb-6">Puzzle Game</h1>
+    <div style={{ textAlign: "center", marginTop: 50 }}>
+      <h1>Puzzle Game</h1>
 
-      {user ? (
-        <div className="text-center">
-          <img
-            src={user.photoURL || ""}
-            className="w-24 rounded-full mx-auto mb-4"
-          />
-          <h2 className="text-2xl">Welcome {user.displayName}</h2>
-        </div>
+      {!user ? (
+        <button onClick={handleLogin}>Login with Google</button>
       ) : (
-        <button
-          onClick={login}
-          className="bg-blue-600 px-6 py-3 rounded-lg hover:bg-blue-700"
-        >
-          Login with Google
-        </button>
+        <>
+          <h3>Welcome {user.displayName}</h3>
+          <h2>Level: {level}</h2>
+          <h2>Score: {score}</h2>
+
+          <button onClick={completeLevel}>Complete Level</button>
+          <br /><br />
+          <button onClick={handleLogout}>Logout</button>
+        </>
       )}
     </div>
   );
