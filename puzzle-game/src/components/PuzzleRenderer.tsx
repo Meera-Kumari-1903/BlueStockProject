@@ -1,3 +1,4 @@
+import React from "react";
 import { Puzzle } from "../types/puzzleTypes";
 
 import MathPuzzleView from "./puzzles/MathPuzzleView";
@@ -6,15 +7,14 @@ import PatternPuzzleView from "./puzzles/PatternPuzzleView";
 import OddPuzzleView from "./puzzles/OddPuzzleView";
 import MemoryPuzzleView from "./puzzles/MemoryPuzzleView";
 
-interface Props {
+type Props = {
   puzzle: Puzzle;
   onSubmit: (answer: unknown) => void;
-}
+};
 
-export default function PuzzleRenderer({ puzzle, onSubmit }: Props) {
+const PuzzleRenderer: React.FC<Props> = ({ puzzle, onSubmit }) => {
 
   switch (puzzle.type) {
-
     case "math":
       return <MathPuzzleView puzzle={puzzle} onSubmit={onSubmit} />;
 
@@ -31,6 +31,8 @@ export default function PuzzleRenderer({ puzzle, onSubmit }: Props) {
       return <MemoryPuzzleView puzzle={puzzle} onSubmit={onSubmit} />;
 
     default:
-      return <div>Unknown Puzzle</div>;
+      return <h3>Unknown puzzle</h3>;
   }
-}
+};
+
+export default PuzzleRenderer;

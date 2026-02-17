@@ -1,4 +1,5 @@
 import { seededRandom } from "../utils/seededRandom";
+import { getTodaySeed } from "./dailySeed";
 
 import {
   Puzzle,
@@ -12,8 +13,10 @@ import {
 export class PuzzleEngine {
 
   // ------------------ MAIN ENTRY ------------------
-  static generate(seed: number, type: string): Puzzle {
+  static generate(type: string): Puzzle {
 
+    // ⭐ DAILY SEED (MOST IMPORTANT LINE)
+    const seed = getTodaySeed();
     const rand = seededRandom(seed);
 
     // daily random puzzle selection
@@ -85,29 +88,26 @@ export class PuzzleEngine {
 
   // ------------------ WORD ------------------
   private static generateWord(seed: number): WordPuzzle {
-  const rand = seededRandom(seed);
+    const rand = seededRandom(seed);
 
-  const words = ["react", "firebase", "engine", "puzzle", "coding", "logic"];
-  const word = words[Math.floor(rand() * words.length)];
+    const words = ["react", "firebase", "engine", "puzzle", "coding", "logic"];
+    const word = words[Math.floor(rand() * words.length)];
 
-  const letters = word.split("");
+    const letters = word.split("");
+    const scrambled = [...letters].sort(() => rand() - 0.5);
 
-  const scrambled = [...letters].sort(() => rand() - 0.5);
-
-  return {
-    id: "word-" + seed,
-    type: "word",
-    question: `Unscramble the word`,
-    letters: scrambled,
-    solution: word,
-    difficulty: "easy",
-  };
-}
-
+    return {
+      id: "word-" + seed,
+      type: "word",
+      question: `Unscramble the word`,
+      letters: scrambled,
+      solution: word,
+      difficulty: "easy",
+    };
+  }
 
   // ------------------ PATTERN ------------------
   private static generatePattern(seed: number): PatternPuzzle {
-
     const rand = seededRandom(seed);
 
     const start = Math.floor(rand() * 5) + 1;
@@ -132,7 +132,6 @@ export class PuzzleEngine {
 
   // ------------------ ODD ONE ------------------
   private static generateOdd(seed: number): OddPuzzle {
-
     const groups = [
       ["Dog", "Cat", "Cow", "Car"],
       ["Apple", "Banana", "Mango", "Potato"],
@@ -154,21 +153,20 @@ export class PuzzleEngine {
   }
 
   // ------------------ MEMORY ------------------
-private static generateMemory(seed: number): MemoryPuzzle {
-  const rand = seededRandom(seed);
+  private static generateMemory(seed: number): MemoryPuzzle {
+    const rand = seededRandom(seed);
 
-  const grid: number[] = Array.from({ length: 6 }, () =>
-    Math.floor(rand() * 9) + 1
-  );
+    const grid: number[] = Array.from({ length: 6 }, () =>
+      Math.floor(rand() * 9) + 1
+    );
 
-  return {
-    id: "memory-" + seed,
-    type: "memory",
-    question: `Memorize these numbers for 5 seconds`,
-    grid,
-    solution: grid,
-    difficulty: "hard",
-  };
-}
-
+    return {
+      id: "memory-" + seed,
+      type: "memory",
+      question: `Memorize these numbers for 5 seconds`,
+      grid,
+      solution: grid,
+      difficulty: "hard",
+    };
+  }
 }

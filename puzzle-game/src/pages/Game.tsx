@@ -1,43 +1,29 @@
-import {  useState } from "react";
-
+import React from "react";
+import { Puzzle } from "../types/puzzleTypes";
 import PuzzleRenderer from "../components/PuzzleRenderer";
-import { getTodaySeed } from "../utils/dateSeed";
 import { PuzzleEngine } from "../engine/PuzzleEngine";
 
-
-
-interface Props {
+type Props = {
+  puzzle: Puzzle;
   onSolved: () => void;
-}
+};
 
-const Game: React.FC<Props> = () => {
+const Game: React.FC<Props> = ({ puzzle, onSolved }) => {
 
-  
+  const handleSubmit = (answer: unknown) => {
+    const correct = PuzzleEngine.validate(puzzle, answer);
 
-
-  // generate puzzle only ONCE
-  const [puzzle, setPuzzle] = useState(() => {
-  const seed = getTodaySeed();
-  return PuzzleEngine.generate(seed, "daily");
-});
-
-
-  if (!puzzle) return <h2>Loading puzzle...</h2>;
-
-function handleSubmit(answer: unknown) {
-  if (!puzzle) return;
-
-  const correct = PuzzleEngine.validate(puzzle, answer);
-
-  if (correct) {
-    alert("✅ Correct Answer!");
-  } else {
-    alert("❌ Wrong Answer!");
-  }
-}
+    if (correct) {
+      alert("✅ Correct Answer!");
+      onSolved();
+    } else {
+      alert("❌ Wrong Answer. Try again!");
+    }
+  };
 
   return (
     <div>
+      <h2 style={{ textAlign: "center" }}>Today's Puzzle</h2>
       <PuzzleRenderer puzzle={puzzle} onSubmit={handleSubmit} />
     </div>
   );
