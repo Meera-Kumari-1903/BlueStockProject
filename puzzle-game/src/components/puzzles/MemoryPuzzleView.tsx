@@ -2,8 +2,9 @@ import { MemoryPuzzle } from "../../types/puzzleTypes";
 
 interface Props {
   puzzle: MemoryPuzzle;
-  onSubmit: (answer: string[]) => void;
+  onSubmit: (answer: number[]) => void;
 }
+
 
 const MemoryPuzzleView: React.FC<Props> = ({ puzzle, onSubmit }) => {
 

@@ -1,7 +1,23 @@
-import { getTodaySeed } from "../utils/dateSeed";
-import { PuzzleEngine } from "../engine/PuzzleEngine";
+import { PuzzleEngine, Difficulty } from "../engine/PuzzleEngine";
 
-export function getTodayPuzzle() {
+/* ---------------- DATE SEED ---------------- */
+/* Every day generates same number for all players */
+
+function getTodaySeed(): number {
+  const today = new Date();
+
+  return (
+    today.getFullYear() * 10000 +
+    (today.getMonth() + 1) * 100 +
+    today.getDate()
+  );
+}
+
+/* ---------------- DAILY PUZZLE ---------------- */
+
+export function getTodayPuzzle(difficulty: Difficulty = "medium") {
   const seed = getTodaySeed();
-  return PuzzleEngine.generate(seed, "daily");
+
+  // same seed = same puzzle for everyone
+  return PuzzleEngine.generate("daily", seed, difficulty);
 }
